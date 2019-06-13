@@ -1,0 +1,28 @@
+#!/usr/bin/env ruby
+
+require 'socket'
+require 'timeout'
+
+def knock?(ip, port)
+  begin
+    Timeout::timeout(1) do
+      begin
+        s = TCPSocket.new(ip, port)
+        s.close
+        return true
+      rescue Errno::ECONNREFUSED, Errno::EHOSTUNREACH
+        return false
+      end
+    end
+  rescue Timeout::Error
+  end
+
+  return false
+end
+
+host = ARGV.shift
+puts "Knocking #{host} ports #{ARGV.join(' ')}"
+ARGV.each do|a|
+  knock?( host, a )
+  sleep 1
+end
